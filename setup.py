@@ -7,7 +7,6 @@ setup(
     packages=find_packages(),
     author='Ritik Sahu',
     author_email='ritikrks@gmail.com',
-    description='Storage backend to store feeds in Microsoft redis.',
     url='https://github.com/ritikkumarsahu/scrapy-feedexporter-redis',
     python_requires=">=3.8",
     install_requires=[
