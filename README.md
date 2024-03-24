@@ -1,6 +1,6 @@
 # redis Feed Storage
 
-[Storage backend](https://docs.scrapy.org/en/latest/topics/feed-exports.html#storage-backends) to store feeds in [Microsoft redis](https://www.microsoft.com/en-us/microsoft-365/redis/online-cloud-storage). 
+[Storage backend](https://docs.scrapy.org/en/latest/topics/feed-exports.html#storage-backends) to store feeds in [Redis](https://redis.io/). 
 - URI scheme: `redis`
 - Example URI: `redis://user:password@host:port/db`
 
