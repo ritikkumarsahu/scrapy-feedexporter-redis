@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class redisFeedStorage(BlockingFeedStorage):
-    def __init__(self, uri, list_key, *, feed_options=None):
-        if not list_key:
-            raise NotConfigured("Missing redis_list_key")
+    def __init__(self, uri, list_id, *, feed_options=None):
+        if not list_id:
+            raise NotConfigured("Missing redis_list_id")
 
         if feed_options and feed_options.get("overwrite", True) is False:
             raise NotConfigured(
@@ -19,7 +19,7 @@ class redisFeedStorage(BlockingFeedStorage):
                 "remove the overwrite option from your FEEDS setting or set it to True."
             )
         self.client = redis.Redis.from_url(uri)
-        self.list_key = list_key
+        self.list_id = list_id
         
 
     @classmethod
@@ -27,7 +27,7 @@ class redisFeedStorage(BlockingFeedStorage):
         return build_storage(
             cls,
             uri,
-            list_key=crawler.settings.get("REDIS_LIST_KEY"),
+            list_id=crawler.settings.get("REDIS_LIST_ID"),
             feed_options=feed_options,
         )
 
@@ -35,9 +35,9 @@ class redisFeedStorage(BlockingFeedStorage):
     def _store_in_thread(self, file: TextIOWrapper):
         file.seek(0)
         content = file.read()
-        res = self.client.rpush(self.list_key, content)
+        res = self.client.rpush(self.list_id, content)
         if not res:
             raise NotConfigured(f"Failed to upload the file to redis: {res}")
-        logger.info(f"Feed file uploaded to redis: {self.list_key}")
+        logger.info(f"Feed file uploaded to redis: {self.list_id}")
         file.close()
         self.client.close()
