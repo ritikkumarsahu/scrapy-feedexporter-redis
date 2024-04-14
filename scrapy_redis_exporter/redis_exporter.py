@@ -34,18 +34,23 @@ class redisFeedStorage(BlockingFeedStorage):
         )
 
 
+    def close_connection(self, file: TextIOWrapper):
+        file.close()
+        self.client.close()
+
     def _store_in_thread(self, file: TextIOWrapper):
         file.seek(0)
         content = file.read()
         size = file.tell()/1048576
         if size > 500:
-            raise NotSupported(f"File is too large to store in redis {round(size,2)} > 500 MB")
+            self.close_connection(file)
+            raise NotSupported(f"File is too large to store in redis: {round(size,2)} > 500 MB")
         else:
             res = self.client.rpush(self.list_id, content)
             if self.expire_duration:
                 self.client.expire(self.list_id, self.expire_duration)
             if not res:
-                raise NotConfigured(f"Failed to upload the file to redis: {res}")
+                self.close_connection(file)
+                raise NotSupported(f"Failed to upload the file to redis: {res}")
             logger.info(f"Feed file uploaded to redis: {self.list_id}")
-        file.close()
-        self.client.close()
+        self.close_connection(file)
